@@ -9,6 +9,7 @@ module.exports = {
   output: {
     path: `${__dirname}/dist/`,
     assetModuleFilename: "assets/[name].[hash][ext][query]",
+    publicPath: "/",
   },
   module: {
     rules: [
