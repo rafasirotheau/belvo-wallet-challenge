@@ -8,6 +8,7 @@ module.exports = {
   entry: "./src/index.tsx",
   output: {
     path: `${__dirname}/dist/`,
+    assetModuleFilename: "assets/[name].[hash][ext][query]",
   },
   module: {
     rules: [
@@ -18,6 +19,25 @@ module.exports = {
           extensions: [".ts", ".tsx", ".js", ".json"],
         },
         use: "ts-loader",
+      },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.scss$/,
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
+      {
+        test: /\.svg$/i,
+        type: "asset/resource",
+        resourceQuery: /url/,
+      },
+      {
+        test: /\.svg$/i,
+        issuer: /\.tsx?$/,
+        resourceQuery: { not: [/url/] },
+        use: ["@svgr/webpack"],
       },
     ],
   },

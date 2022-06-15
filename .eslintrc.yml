@@ -5,6 +5,7 @@ env:
 extends:
   - eslint:recommended
   - plugin:react/recommended
+  - plugin:react/jsx-runtime
   - plugin:@typescript-eslint/recommended
 parser: "@typescript-eslint/parser"
 parserOptions:
@@ -15,3 +16,6 @@ parserOptions:
 plugins:
   - react
   - "@typescript-eslint"
+settings:
+  react:
+    version: detect
