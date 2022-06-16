@@ -1,0 +1,51 @@
+name: "Belvo Wallet :: Lint & Test"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  NODE_VERSION: 16.x.x
+
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Code Quality
+        run: |
+          echo "Tools: ESLint, Stylelint & Prettier"
+          ./.scripts/code-quality-check.sh
+
+      - name: Tests
+        env:
+          CI: true
+        run: |
+          npm test -- --coverage
+
+      - name: Build
+        run: |
+          npm build
+
+      - name: Upload built dist folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-build
+          path: ./dist
