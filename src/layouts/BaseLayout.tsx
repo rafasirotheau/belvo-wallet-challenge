@@ -6,7 +6,9 @@ const BaseLayout = ({ children }: { children?: ReactNode }) => {
   return (
     <>
       <AppHeader />
-      <ContainerContent component="main">{children}</ContainerContent>
+      <ContainerContent component="main" sx={{ paddingTop: 3 }}>
+        {children}
+      </ContainerContent>
     </>
   );
 };

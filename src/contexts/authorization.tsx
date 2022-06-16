@@ -14,7 +14,7 @@ import { doLogin } from "../api/belvo-wallet";
 import { setToken } from "../api/belvo-wallet.config";
 import { LoginPayloadType, LoginResponseType } from "../api/belvo-wallet.types";
 
-interface AuthContextData {
+export interface AuthContextData {
   authInfo?: AuthInfoType;
   loginHandler?: (args: LoginPayloadType) => Promise<LoginResponseType["data"]>;
 }

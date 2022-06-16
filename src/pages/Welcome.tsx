@@ -1,7 +1,5 @@
-import BaseLayout from "../layouts/BaseLayout";
-
 const Welcome = () => {
-  return <BaseLayout>Welcome to Belvo Wallet</BaseLayout>;
+  return <div>Welcome to Belvo Wallet</div>;
 };
 
 export default Welcome;
