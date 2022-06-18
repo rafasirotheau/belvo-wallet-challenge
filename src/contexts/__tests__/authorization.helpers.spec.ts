@@ -1,23 +1,18 @@
 import {
   getExpirationDate,
   isExpired,
-  localStorageKey,
+  LOCALSTORAGE_KEY,
   tokenFromLocalStorage,
   generateAuthInfo,
 } from "../authorization.helpers";
-
-const loginResponse = {
-  access_token:
-    "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2aWNreSIsImV4cCI6MTY1NTMyNjc0OX0.JIkYKkfyQ0Y18qZarGIxWfUurPuqrJZu_4w7OViqxSAeHFAHA_R7ikjoszzzDcAgyaH32q_mI7MDpf7a3EaMVg",
-  token_type: "bearer",
-};
+import { mockedTokenData, mockedLoginResponse } from "./__mocks__";
 
 describe("getExpirationDate()", () => {
   it("should return a valid expiration value", () => {
-    const exp = getExpirationDate(loginResponse.access_token);
+    const exp = getExpirationDate(mockedLoginResponse.access_token);
 
     expect(typeof exp).toBe("number");
-    expect(exp).toBe(1655326749000);
+    expect(exp).toBe(1655565542000);
   });
 
   it("should return null", () => {
@@ -28,7 +23,7 @@ describe("getExpirationDate()", () => {
 });
 
 describe("isExpired()", () => {
-  const expiration = 1655326749000;
+  const { expiration } = mockedTokenData;
 
   beforeAll(() => {
     jest.useFakeTimers();
@@ -56,33 +51,33 @@ describe("tokenFromLocalStorage()", () => {
   const spyGet = jest.spyOn(window.localStorage.__proto__, "getItem");
 
   afterAll(() => {
-    window.localStorage.removeItem(localStorageKey);
+    window.localStorage.removeItem(LOCALSTORAGE_KEY);
   });
 
   it("should set token", () => {
-    tokenFromLocalStorage.set(loginResponse);
+    tokenFromLocalStorage.set(mockedLoginResponse);
     expect(spySet).toHaveBeenCalledWith(
-      localStorageKey,
-      JSON.stringify(loginResponse)
+      LOCALSTORAGE_KEY,
+      JSON.stringify(mockedLoginResponse)
     );
   });
 
   it("should get token", () => {
     const token = tokenFromLocalStorage.get();
-    expect(spyGet).toHaveBeenCalledWith(localStorageKey);
-    expect(token).toEqual(loginResponse);
+    expect(spyGet).toHaveBeenCalledWith(LOCALSTORAGE_KEY);
+    expect(token).toEqual(mockedLoginResponse);
   });
 });
 
 describe("generateAuthInfo()", () => {
   it("should generate valid authInfo", () => {
-    const authInfo = generateAuthInfo(loginResponse);
+    const authInfo = generateAuthInfo(mockedLoginResponse);
 
-    expect(authInfo.accessToken).toEqual(loginResponse.access_token);
+    expect(authInfo.accessToken).toEqual(mockedLoginResponse.access_token);
     expect(authInfo).toMatchInlineSnapshot(`
       Object {
-        "accessToken": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2aWNreSIsImV4cCI6MTY1NTMyNjc0OX0.JIkYKkfyQ0Y18qZarGIxWfUurPuqrJZu_4w7OViqxSAeHFAHA_R7ikjoszzzDcAgyaH32q_mI7MDpf7a3EaMVg",
-        "expiration": 1655326749000,
+        "accessToken": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2aWNreSIsImV4cCI6MTY1NTU2NTU0Mn0.z2fDTdH5yuba6wHFN4jsVS7edCzYi7uzHuvuy1MRY-N_dX3QeAJxHFwn1I0YALfRVTae3iQcbsiX2sRSOtSxfQ",
+        "expiration": 1655565542000,
         "isLoggedIn": true,
       }
     `);

@@ -26,13 +26,13 @@ export const getExpirationDate = (
 export const isExpired = (exp?: AuthInfoType["expiration"]) =>
   typeof exp === "number" ? Date.now() > exp : false;
 
-export const localStorageKey = "JWT_AUTH_TOKEN";
+export const LOCALSTORAGE_KEY = "JWT_AUTH_TOKEN";
 
 export const tokenFromLocalStorage = {
   get: (): LoginResponseType["data"] =>
-    JSON.parse(localStorage.getItem(localStorageKey) || "null"),
+    JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || "null"),
   set: (data: LoginResponseType["data"]) =>
-    localStorage.setItem(localStorageKey, JSON.stringify(data)),
+    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data)),
 };
 
 export const generateAuthInfo = (
