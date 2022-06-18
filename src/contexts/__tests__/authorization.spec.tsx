@@ -1,4 +1,4 @@
-import {useAuthContext, AuthProvider} from "../authorization";
+import { useAuthContext, AuthProvider } from "../authorization";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import * as Helpers from "../authorization.helpers";
 import * as ApiConfig from "../../api/belvo-wallet.config";
@@ -13,9 +13,9 @@ const onSuccessMock = jest.fn();
 
 doLoginSpy.mockResolvedValue(mockedLoginResponse);
 const mockedLoginCredentials = {
-    username: "user",
+  username: "user",
   password: "123foo",
-  }
+};
 const TestingComponent = () => {
   const { loginHandler, authInfo } = useAuthContext();
 
@@ -50,7 +50,7 @@ async function testingRender() {
     expiration: getByTestId("expiration").textContent,
     isLoggedIn: getByTestId("isLoggedIn").textContent,
     button: getByRole("button"),
-    getByTestId
+    getByTestId,
   };
 }
 
@@ -82,14 +82,15 @@ describe("AuthProvider", () => {
     expect(setTokenSpy).toHaveBeenCalledWith(mockedTokenData.accessToken);
 
     jest.useRealTimers();
-    window.localStorage.removeItem(LOCALSTORAGE_KEY)
+    window.localStorage.removeItem(LOCALSTORAGE_KEY);
   });
 
   it("should proper handle login", async () => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date(mockedTokenData.expiration + 100000));
 
-    const { button, token, expiration, isLoggedIn, getByTestId } = await testingRender();
+    const { button, token, expiration, isLoggedIn, getByTestId } =
+      await testingRender();
 
     expect(token).toBe("");
     expect(expiration).toBe("");
@@ -102,9 +103,11 @@ describe("AuthProvider", () => {
     expect(onSuccessMock).toHaveBeenCalledWith(mockedLoginResponse);
     expect(doLoginSpy).toHaveBeenCalledWith(mockedLoginCredentials);
 
-    expect(getByTestId("token").textContent).toBe(mockedLoginResponse.access_token)
-    expect(getByTestId("expiration").textContent).toBe("1655565542000")
-    expect(getByTestId("isLoggedIn").textContent).toBe("true")
+    expect(getByTestId("token").textContent).toBe(
+      mockedLoginResponse.access_token
+    );
+    expect(getByTestId("expiration").textContent).toBe("1655565542000");
+    expect(getByTestId("isLoggedIn").textContent).toBe("true");
 
     jest.useRealTimers();
   });

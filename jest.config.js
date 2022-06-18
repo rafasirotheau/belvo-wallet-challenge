@@ -3,5 +3,5 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "jsdom",
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
-  modulePathIgnorePatterns: ["__mocks__"]
+  modulePathIgnorePatterns: ["__mocks__"],
 };
