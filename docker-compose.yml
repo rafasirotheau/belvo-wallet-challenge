@@ -1,0 +1,17 @@
+version: "3.7"
+services:
+  dist-server:
+    build:
+      context: .
+    container_name: belvo_wallet_dist
+    ports:
+      - "3000:80"
+  dev-server:
+    build:
+      context: .
+      target: dependencies-layer
+    command: npm run start
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"

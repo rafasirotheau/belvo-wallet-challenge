@@ -42,7 +42,7 @@ jobs:
 
       - name: Build
         run: |
-          npm build
+          npm run build
 
       - name: Upload built dist folder
         uses: actions/upload-artifact@v3
