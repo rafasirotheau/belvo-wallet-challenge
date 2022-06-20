@@ -6,27 +6,33 @@ import {
   Routes,
 } from "react-router-dom";
 import { AuthProvider } from "./contexts/authorization";
-import { LoadingBackdrop } from "./components";
+import { LoadingBackdrop } from "./components/commons";
 import BaseLayout from "./layouts/BaseLayout";
+import RestrictedPages from "./layouts/RestrictedPages";
 
-const Welcome = lazy(() => import("./pages/Welcome"));
 const UserLogin = lazy(() => import("./pages/UserLogin"));
 const UserWallet = lazy(() => import("./pages/UserWallet"));
 
 const App = () => (
   <AuthProvider>
-    <BaseLayout>
-      <Router>
+    <Router>
+      <BaseLayout>
         <Suspense fallback={<LoadingBackdrop />}>
           <Routes>
-            <Route path="/welcome" element={<Welcome />} />
             <Route path="/login" element={<UserLogin />} />
-            <Route path="/user/wallet" element={<UserWallet />} />
-            <Route path="*" element={<Navigate to="/welcome" replace />} />
+            <Route
+              path="/user/wallet"
+              element={
+                <RestrictedPages>
+                  <UserWallet />
+                </RestrictedPages>
+              }
+            />
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </Suspense>
-      </Router>
-    </BaseLayout>
+      </BaseLayout>
+    </Router>
   </AuthProvider>
 );
 

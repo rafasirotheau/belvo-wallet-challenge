@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Container, Stack, TextField, Typography, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useAuthContext } from "../contexts/authorization";
-import { SectionHeading } from "../components";
+import { SectionHeading } from "../components/commons";
 
 const UserLogin = () => {
   const [credentials, setCredentials] = useState({
@@ -71,6 +71,7 @@ const UserLogin = () => {
             }}
             variant="outlined"
             name="password"
+            type="password"
             value={credentials.password}
             onChange={inputChangeHandler}
             error={!!formError}
