@@ -1,2 +1,1 @@
-export { default as SectionHeading } from "./SectionHeading";
-export { default as LoadingBackdrop } from "./LoadingBackdrop";
+export { default as WalletTransactionsList } from "./WalletTransactionsList";

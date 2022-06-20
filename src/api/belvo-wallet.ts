@@ -1,12 +1,12 @@
 import BelvoWalletApi from "./belvo-wallet.config";
 import {
+  BaseTransactionPayload,
   ContactsResponseType,
   LoginPayloadType,
   LoginResponseType,
-  RequestPayloadType,
-  SendPayloadType,
   TransactionProps,
-  WalletResponseType,
+  TransactionRole,
+  WalletResponseData,
 } from "./belvo-wallet.types";
 
 export function getContacts() {
@@ -18,25 +18,24 @@ export function getContacts() {
 }
 
 export function getWallet() {
-  return BelvoWalletApi.get("/wallet").then((response: WalletResponseType) => {
+  return BelvoWalletApi.get("/wallet").then((response): WalletResponseData => {
     return response.data;
   });
 }
 
-export function doWalletSend(payload: SendPayloadType) {
-  return BelvoWalletApi.post("/wallet/send", payload).then(
-    ({ data }: { data: TransactionProps }) => {
-      return data;
-    }
-  );
-}
+export function doWalletTransaction(
+  payload: BaseTransactionPayload,
+  userRole: NonNullable<TransactionRole>,
+  contact: string
+) {
+  const endpoint = `/wallet/${userRole === "sender" ? "send" : "request"}`;
 
-export function doWalletRequest(payload: RequestPayloadType) {
-  return BelvoWalletApi.post("/wallet/request", payload).then(
-    ({ data }: { data: TransactionProps }) => {
-      return data;
-    }
-  );
+  return BelvoWalletApi.post(endpoint, {
+    ...payload,
+    [userRole === "sender" ? "receiver" : "sender"]: contact,
+  }).then(({ data }: { data: TransactionProps }) => {
+    return data;
+  });
 }
 
 export function doLogin(payload: LoginPayloadType) {

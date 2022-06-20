@@ -1,16 +1,22 @@
 import { LoginResponseType } from "../api/belvo-wallet.types";
 
+export interface JwtPayloadType {
+  exp: number | null;
+  sub: string;
+}
+
 export interface AuthInfoType {
   accessToken: LoginResponseType["data"]["access_token"];
   isLoggedIn: boolean;
-  expiration: number | null;
+  expiration: JwtPayloadType["exp"];
+  username: JwtPayloadType["sub"];
 }
 
-export const getExpirationDate = (
+export const getJwtPayload = (
   accessToken?: AuthInfoType["accessToken"]
-): AuthInfoType["expiration"] => {
+): JwtPayloadType => {
   if (!accessToken) {
-    return null;
+    return { exp: null, sub: "" };
   }
 
   let jwt;
@@ -20,11 +26,14 @@ export const getExpirationDate = (
     // do nothing
   }
 
-  return jwt?.exp * 1000 || null;
+  return {
+    exp: jwt?.exp * 1000 || null,
+    sub: jwt?.sub || "",
+  };
 };
 
 export const isExpired = (exp?: AuthInfoType["expiration"]) =>
-  typeof exp === "number" ? Date.now() > exp : false;
+  typeof exp === "number" ? Date.now() > exp : true;
 
 export const LOCALSTORAGE_KEY = "JWT_AUTH_TOKEN";
 
@@ -33,17 +42,19 @@ export const tokenFromLocalStorage = {
     JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || "null"),
   set: (data: LoginResponseType["data"]) =>
     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data)),
+  remove: () => localStorage.removeItem(LOCALSTORAGE_KEY),
 };
 
 export const generateAuthInfo = (
   data?: LoginResponseType["data"] | null
 ): AuthInfoType => {
   const accessToken = data?.access_token || "";
-  const expiration = getExpirationDate(accessToken);
+  const { exp: expiration, sub: username } = getJwtPayload(accessToken);
 
   return {
     accessToken,
     expiration,
-    isLoggedIn: !!accessToken && isExpired(expiration),
+    username,
+    isLoggedIn: !!accessToken && !isExpired(expiration),
   };
 };

@@ -2,19 +2,18 @@ import MockAdapter from "axios-mock-adapter";
 import BelvoWalletApi from "../belvo-wallet.config";
 import {
   doLogin,
-  doWalletRequest,
-  doWalletSend,
+  doWalletTransaction,
   getContacts,
   getWallet,
 } from "../belvo-wallet";
 import {
+  BaseTransactionPayload,
   ContactsResponseType,
   LoginPayloadType,
   LoginResponseType,
-  RequestPayloadType,
-  SendPayloadType,
   TransactionProps,
-  WalletResponseType,
+  TransactionRole,
+  WalletResponseData,
 } from "../belvo-wallet.types";
 
 const mock = new MockAdapter(BelvoWalletApi);
@@ -56,7 +55,7 @@ describe("Belvo Wallet API :: Contacts", () => {
 });
 
 describe("Belvo Wallet API :: Wallet", () => {
-  const successData: WalletResponseType["data"] = {
+  const successData: WalletResponseData = {
     email: "user@example.com",
     transactions: [
       {
@@ -84,45 +83,50 @@ describe("Belvo Wallet API :: Wallet", () => {
   });
 });
 
-describe("Belvo Wallet API :: Wallet Sending", () => {
-  const payload: SendPayloadType = {
+describe("Belvo Wallet API :: Wallet Transaction", () => {
+  const mockedPayload: BaseTransactionPayload = {
     description: "string",
     amount: 10,
     currency: "ETH",
-    receiver: "user2@example.com",
-  };
-  const successData: TransactionProps = {
-    ...payload,
-    sender: "user@example.com",
-    status: "Pending",
   };
 
-  mock.onPost("/wallet/send", payload).reply(200, successData);
+  const contactEmail = "user2@example.com";
+  const userEmail = "user@example.com";
+
+  const successData = (
+    role: NonNullable<TransactionRole>
+  ): TransactionProps => {
+    return {
+      ...mockedPayload,
+      receiver: role === "sender" ? contactEmail : userEmail,
+      sender: role === "sender" ? userEmail : contactEmail,
+      status: "Pending",
+    };
+  };
+
+  mock
+    .onPost("/wallet/send", { ...mockedPayload, receiver: contactEmail })
+    .reply(200, successData);
+  mock
+    .onPost("/wallet/request", { ...mockedPayload, sender: contactEmail })
+    .reply(200, successData);
 
   it("should successfully send from wallet", async () => {
-    const data = await doWalletSend(payload);
+    const data = await doWalletTransaction(
+      mockedPayload,
+      "sender",
+      contactEmail
+    );
 
     expect(data).toEqual(successData);
   });
-});
 
-describe("Belvo Wallet API :: Wallet Requesting", () => {
-  const payload: RequestPayloadType = {
-    description: "string",
-    amount: 10,
-    currency: "ETH",
-    sender: "user@example.com",
-  };
-  const successData: TransactionProps = {
-    ...payload,
-    receiver: "user2@example.com",
-    status: "Pending",
-  };
-
-  mock.onPost("/wallet/request", payload).reply(200, successData);
-
-  it("should successfully send from wallet", async () => {
-    const data = await doWalletRequest(payload);
+  it("should successfully receive to wallet", async () => {
+    const data = await doWalletTransaction(
+      mockedPayload,
+      "receiver",
+      contactEmail
+    );
 
     expect(data).toEqual(successData);
   });

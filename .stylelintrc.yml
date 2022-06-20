@@ -2,3 +2,7 @@ extends:
   - "stylelint-config-standard"
   - "stylelint-config-prettier"
 customSyntax: "@stylelint/postcss-css-in-js"
+rules:
+  function-no-unknown:
+    - true
+    - ignoreFunctions: ["/^theme/"]

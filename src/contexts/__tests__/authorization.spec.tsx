@@ -29,6 +29,7 @@ const TestingComponent = () => {
     <>
       <p data-testid="token">{authInfo?.accessToken}</p>
       <p data-testid="expiration">{authInfo?.expiration}</p>
+      <p data-testid="username">{authInfo?.username}</p>
       <p data-testid="isLoggedIn">{authInfo?.isLoggedIn?.toString()}</p>
 
       <button onClick={onClick}>login</button>
@@ -48,6 +49,7 @@ async function testingRender() {
   return {
     token: getByTestId("token").textContent,
     expiration: getByTestId("expiration").textContent,
+    username: getByTestId("username").textContent,
     isLoggedIn: getByTestId("isLoggedIn").textContent,
     button: getByRole("button"),
     getByTestId,
@@ -60,26 +62,28 @@ describe("AuthProvider", () => {
   });
 
   it("should instantiate provider without localStorage token", async () => {
-    const { token, expiration, isLoggedIn } = await testingRender();
+    const { token, expiration, username, isLoggedIn } = await testingRender();
 
     expect(token).toBe("");
     expect(expiration).toBe("");
+    expect(username).toBe("");
     expect(isLoggedIn).toBe("false");
   });
 
   it("should instantiate provider with localStorage token", async () => {
     jest.useFakeTimers();
-    jest.setSystemTime(new Date(mockedTokenData.expiration + 100000));
+    jest.setSystemTime(new Date(mockedTokenData.expiration - 100000));
 
     Helpers.tokenFromLocalStorage.set(mockedLoginResponse);
 
-    const { token, expiration, isLoggedIn } = await testingRender();
+    const { token, username, expiration, isLoggedIn } = await testingRender();
 
     expect(token).toBe(mockedLoginResponse.access_token);
     expect(expiration).toBe("1655565542000");
+    expect(username).toBe("vicky");
     expect(isLoggedIn).toBe("true");
 
-    expect(setTokenSpy).toHaveBeenCalledWith(mockedTokenData.accessToken);
+    expect(setTokenSpy).toHaveBeenCalledWith(token);
 
     jest.useRealTimers();
     window.localStorage.removeItem(LOCALSTORAGE_KEY);
@@ -87,13 +91,14 @@ describe("AuthProvider", () => {
 
   it("should proper handle login", async () => {
     jest.useFakeTimers();
-    jest.setSystemTime(new Date(mockedTokenData.expiration + 100000));
+    jest.setSystemTime(new Date(mockedTokenData.expiration - 100000));
 
-    const { button, token, expiration, isLoggedIn, getByTestId } =
+    const { button, token, expiration, username, isLoggedIn, getByTestId } =
       await testingRender();
 
     expect(token).toBe("");
     expect(expiration).toBe("");
+    expect(username).toBe("");
     expect(isLoggedIn).toBe("false");
 
     fireEvent.click(button);
@@ -107,6 +112,7 @@ describe("AuthProvider", () => {
       mockedLoginResponse.access_token
     );
     expect(getByTestId("expiration").textContent).toBe("1655565542000");
+    expect(getByTestId("username").textContent).toBe("vicky");
     expect(getByTestId("isLoggedIn").textContent).toBe("true");
 
     jest.useRealTimers();

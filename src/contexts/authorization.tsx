@@ -17,6 +17,7 @@ import { LoginPayloadType, LoginResponseType } from "../api/belvo-wallet.types";
 export interface AuthContextData {
   authInfo?: AuthInfoType;
   loginHandler?: (args: LoginPayloadType) => Promise<LoginResponseType["data"]>;
+  logoutHandler?: () => void;
 }
 
 interface AuthProviderProps {
@@ -38,6 +39,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     });
   };
 
+  const logoutHandler = () => {
+    setAuthInfo(generateAuthInfo());
+    tokenFromLocalStorage.remove();
+  };
+
   useEffect(() => {
     if (authInfo?.accessToken) {
       setToken(authInfo.accessToken);
@@ -45,7 +51,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [authInfo?.accessToken]);
 
   return (
-    <AuthContext.Provider value={{ authInfo, loginHandler }}>
+    <AuthContext.Provider value={{ authInfo, loginHandler, logoutHandler }}>
       {children}
     </AuthContext.Provider>
   );

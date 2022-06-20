@@ -7,5 +7,6 @@ export const mockedLoginResponse = {
 export const mockedTokenData = {
   accessToken: mockedLoginResponse.access_token,
   expiration: 1655565542000,
+  username: "vicky",
   isLoggedIn: true,
 };

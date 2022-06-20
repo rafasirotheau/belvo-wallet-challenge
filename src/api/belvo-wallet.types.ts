@@ -1,4 +1,16 @@
-interface ContactsProps {
+import {
+  CURRENCIES,
+  TRANSACTION_ROLES,
+  TRANSACTION_STATUS,
+} from "./belvo-wallet.consts";
+
+export type Currency = typeof CURRENCIES[number];
+type TransactionStatus = typeof TRANSACTION_STATUS[number];
+export type Balance = Record<Currency, number>;
+
+export type TransactionRole = typeof TRANSACTION_ROLES[number] | null;
+
+export interface ContactsProps {
   email: string;
   name: string;
 }
@@ -6,27 +18,30 @@ interface ContactsProps {
 export interface TransactionProps {
   description: string;
   amount: number;
-  currency: "ETH" | "BTC" | "DOGE";
+  currency: Currency;
   sender: string;
   receiver: string;
-  status: "Pending" | "Done" | "Reject";
+  status: TransactionStatus;
 }
 
 export type ContactsResponseType = {
   data: ContactsProps[];
 };
 
-export type WalletResponseType = {
-  data: {
-    email: string;
-    transactions: TransactionProps[];
-    balance: Record<TransactionProps["currency"], number>;
-  };
-};
+export interface WalletResponseData {
+  email: string;
+  transactions: TransactionProps[];
+  balance: Balance;
+}
 
-export type SendPayloadType = Omit<TransactionProps, "sender" | "status">;
-
-export type RequestPayloadType = Omit<TransactionProps, "receiver" | "status">;
+export type BaseTransactionPayload = Pick<
+  TransactionProps,
+  "description" | "amount" | "currency"
+>;
+export type SendTransactionPayload = BaseTransactionPayload &
+  Pick<TransactionProps, "receiver">;
+export type RequestTransactionPayload = BaseTransactionPayload &
+  Pick<TransactionProps, "sender">;
 
 export type LoginPayloadType = {
   password: string;

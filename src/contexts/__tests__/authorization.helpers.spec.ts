@@ -1,5 +1,5 @@
 import {
-  getExpirationDate,
+  getJwtPayload,
   isExpired,
   LOCALSTORAGE_KEY,
   tokenFromLocalStorage,
@@ -7,18 +7,19 @@ import {
 } from "../authorization.helpers";
 import { mockedTokenData, mockedLoginResponse } from "./__mocks__";
 
-describe("getExpirationDate()", () => {
+describe("getJwtPayload()", () => {
   it("should return a valid expiration value", () => {
-    const exp = getExpirationDate(mockedLoginResponse.access_token);
+    const { exp, sub } = getJwtPayload(mockedLoginResponse.access_token);
 
-    expect(typeof exp).toBe("number");
-    expect(exp).toBe(1655565542000);
+    expect(exp).toEqual(1655565542000);
+    expect(sub).toBe("vicky");
   });
 
   it("should return null", () => {
-    expect(getExpirationDate()).toBeNull();
-    expect(getExpirationDate("")).toBeNull();
-    expect(getExpirationDate("some-invalid.string")).toBeNull();
+    const noTokenResponse = { exp: null, sub: "" };
+    expect(getJwtPayload()).toEqual(noTokenResponse);
+    expect(getJwtPayload("")).toEqual(noTokenResponse);
+    expect(getJwtPayload("some-invalid.string")).toEqual(noTokenResponse);
   });
 });
 
@@ -36,13 +37,13 @@ describe("isExpired()", () => {
   it("should return true", () => {
     jest.setSystemTime(new Date(expiration + 1000));
     expect(isExpired(expiration)).toBeTruthy();
+    expect(isExpired()).toBeTruthy();
+    expect(isExpired(null)).toBeTruthy();
   });
 
   it("should return false", () => {
     jest.setSystemTime(new Date(expiration - 1000));
     expect(isExpired(expiration)).toBeFalsy();
-    expect(isExpired()).toBeFalsy();
-    expect(isExpired(null)).toBeFalsy();
   });
 });
 
@@ -78,7 +79,8 @@ describe("generateAuthInfo()", () => {
       Object {
         "accessToken": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2aWNreSIsImV4cCI6MTY1NTU2NTU0Mn0.z2fDTdH5yuba6wHFN4jsVS7edCzYi7uzHuvuy1MRY-N_dX3QeAJxHFwn1I0YALfRVTae3iQcbsiX2sRSOtSxfQ",
         "expiration": 1655565542000,
-        "isLoggedIn": true,
+        "isLoggedIn": false,
+        "username": "vicky",
       }
     `);
   });
@@ -93,6 +95,7 @@ describe("generateAuthInfo()", () => {
         "accessToken": "",
         "expiration": null,
         "isLoggedIn": false,
+        "username": "",
       }
     `);
   });
